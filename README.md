@@ -1,29 +1,29 @@
 # tcg-scraper-python
 
-Web scraping scripts for building a card collector's database.
+Scripts de web scraping para construir una base de datos de cartas coleccionables.
 
-## Requirements
+## Requisitos
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Usage
+## Uso
 
-Run all scrapers:
+Ejecutar todos los scrapers:
 
 ```bash
 python main.py
 ```
 
-Or run individually:
+O ejecutar individualmente:
 
 ```bash
 cd magic.app && python scraper.py
 cd poke.app && python scraper.py
 ```
 
-## Output
+## Salida
 
-- `magic.app/magic.cards.csv` - Magic: The Gathering cards with type
-- `poke.app/poke.cards.csv` - Pokemon TCG cards with quantity and type
+- `magic.app/magic.cards.csv` - Cartas de Magic: The Gathering con tipo
+- `poke.app/poke.cards.csv` - Cartas de Pokemon TCG con cantidad y tipo
