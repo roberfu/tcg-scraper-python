@@ -29,11 +29,9 @@ for url in urls:
 
 db = {}
 try:
-    with open('database.txt', 'r', encoding='utf-8') as f:
-        for line in f:
-            m = re.match(r'^(\d+)\s+(.+)$', line.strip())
-            if m:
-                db[m.group(2).strip()] = int(m.group(1))
+    with open('database.json', 'r', encoding='utf-8') as f:
+        for entry in json.load(f):
+            db[entry['name']] = entry['quantity']
 except FileNotFoundError:
     pass
 

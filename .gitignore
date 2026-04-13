@@ -161,4 +161,4 @@ cython_debug/
 
 # Generated files
 export.txt
-database.txt
+database.json

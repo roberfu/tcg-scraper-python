@@ -48,17 +48,34 @@ for card_type in all_cards:
     for name, qty in all_cards[card_type].items():
         all_flat[name] = max(all_flat.get(name, 0), qty)
 
-db = {}
+def parse_card_name(raw_name):
+    m = re.match(r'^(.+?)\s+\(([A-Z0-9]+)-(\w+)\)$', raw_name, re.IGNORECASE)
+    if m:
+        return m.group(1).strip(), m.group(2).upper(), str(m.group(3))
+    return raw_name, None, None
+
+def get_owned(raw_name, db_entries):
+    name, card_set, card_number = parse_card_name(raw_name)
+    if card_set and card_number:
+        for entry in db_entries:
+            if (entry['name'] == name and
+                    entry.get('card_set', '').upper() == card_set and
+                    str(entry.get('card_number', '')) == card_number):
+                return entry['quantity']
+        return 0
+    for entry in db_entries:
+        if entry['name'] == name:
+            return entry['quantity']
+    return 0
+
+db_entries = []
 try:
-    with open('database.txt', 'r', encoding='utf-8') as f:
-        for line in f:
-            m = re.match(r'^(\d+)\s+(.+)$', line.strip())
-            if m:
-                db[m.group(2).strip()] = int(m.group(1))
+    with open('database.json', 'r', encoding='utf-8') as f:
+        db_entries = json.load(f)
 except FileNotFoundError:
     pass
 
-export = {name: all_flat[name] - db.get(name, 0) for name in all_flat}
+export = {name: all_flat[name] - get_owned(name, db_entries) for name in all_flat}
 export = {name: qty for name, qty in export.items() if qty > 0}
 
 with open('export.txt', 'w', encoding='utf-8') as f:
