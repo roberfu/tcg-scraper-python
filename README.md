@@ -1,15 +1,18 @@
 # tcg-scraper-python
 
-Scripts de web scraping para construir bases de datos de cartas coleccionables.
+Scripts de web scraping para construir listas de cartas coleccionables.
 
 ## Descripción
 
-Proyecto para extraer datos de cartas de Magic: The Gathering y Pokemon TCG desde diversas fuentes.
+Proyecto para extraer datos de cartas de Magic: The Gathering y Pokemon TCG desde diversas fuentes. Cada scraper agrega listas de mazos, filtra cartas básicas/energías básicas, limita la cantidad máxima a 4 por carta y exporta una lista ordenada alfabéticamente.
 
 ## Scrapers disponibles
 
-- `magic.app/` - Magic: The Gathering
-- `poke.app/` - Pokemon TCG
+| Carpeta | Juego | Fuente |
+|---|---|---|
+| `limitless.app/` | Pokemon TCG | play.limitlesstcg.com |
+| `mtgdecks.app/` | Magic: The Gathering | mtgdecks.net |
+| `mtggoldfish.app/` | Magic: The Gathering | mtggoldfish.com |
 
 ## Requisitos
 
@@ -27,23 +30,38 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Configuración
+
+Cada carpeta contiene un archivo `urls.json` con las URLs a scrapear. Edita ese archivo para agregar o quitar mazos.
+
 ## Uso
 
 ```bash
-# Ejecutar todos los scrapers
-python main.py
-
 # Ejecutar un scraper específico
-cd magic.app && python scraper.py
-cd poke.app && python scraper.py
+cd limitless.app && python scraper.py
+cd mtgdecks.app && python scraper.py
+cd mtggoldfish.app && python scraper.py
 ```
 
 ## Salida
 
-- `magic.app/magic.cards.csv` - Cartas de Magic: The Gathering
-- `poke.app/poke.cards.csv` - Cartas de Pokemon TCG
+Cada scraper genera un archivo `export.txt` dentro de su carpeta con el formato:
+
+```
+<cantidad> <nombre de carta>
+```
+
+Ejemplo:
+
+```
+2 Air Balloon
+4 Applin (SCR-12)
+3 Drakuloak (TWM-129)
+```
 
 ## Tech Stack
 
 - [Python](https://www.python.org/) - Lenguaje de programación
-- [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/) - Web scraping
+- [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/) - Parseo de HTML
+- [Requests](https://requests.readthedocs.io/) - Peticiones HTTP
+- [Cloudscraper](https://github.com/VeNoMouS/cloudscraper) - Bypass de protección Cloudflare (mtgdecks)

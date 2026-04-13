@@ -159,6 +159,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# Private files
-magic.app/magic.cards.csv
-poke.app/poke.cards.csv
+# Generated files
+export.txt
