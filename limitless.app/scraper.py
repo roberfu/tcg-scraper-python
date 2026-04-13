@@ -41,22 +41,28 @@ for url in urls:
                         name = match.group(2).strip()
                         if card_type == 'Energy' and name in BASIC_ENERGIES:
                             continue
-                        if name not in all_cards[card_type]:
-                            all_cards[card_type][name] = qty
-                        else:
-                            all_cards[card_type][name] = min(4, all_cards[card_type][name] + qty)
+                        all_cards[card_type][name] = max(all_cards[card_type].get(name, 0), qty)
 
 all_flat = {}
 for card_type in all_cards:
     for name, qty in all_cards[card_type].items():
-        all_flat[name] = min(4, all_flat.get(name, 0) + qty)
+        all_flat[name] = max(all_flat.get(name, 0), qty)
+
+db = {}
+try:
+    with open('database.txt', 'r', encoding='utf-8') as f:
+        for line in f:
+            m = re.match(r'^(\d+)\s+(.+)$', line.strip())
+            if m:
+                db[m.group(2).strip()] = int(m.group(1))
+except FileNotFoundError:
+    pass
+
+export = {name: all_flat[name] - db.get(name, 0) for name in all_flat}
+export = {name: qty for name, qty in export.items() if qty > 0}
 
 with open('export.txt', 'w', encoding='utf-8') as f:
-    for name in sorted(all_flat):
-        f.write(f"{all_flat[name]} {name}\n")
+    for name in sorted(export):
+        f.write(f"{export[name]} {name}\n")
 
-total = sum(sum(v.values()) for v in all_cards.values())
-print(f"Guardadas {total} cartas en export.txt")
-print(f"  Pokémon: {sum(all_cards['Pokémon'].values()) if all_cards['Pokémon'] else 0}")
-print(f"  Trainer: {sum(all_cards['Trainer'].values()) if all_cards['Trainer'] else 0}")
-print(f"  Energy: {sum(all_cards['Energy'].values()) if all_cards['Energy'] else 0}")
+print(f"Guardadas {len(export)} cartas en export.txt")

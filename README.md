@@ -4,7 +4,7 @@ Scripts de web scraping para construir listas de cartas coleccionables.
 
 ## Descripción
 
-Proyecto para extraer datos de cartas de Magic: The Gathering y Pokemon TCG desde diversas fuentes. Cada scraper agrega listas de mazos, filtra cartas básicas/energías básicas, limita la cantidad máxima a 4 por carta y exporta una lista ordenada alfabéticamente.
+Proyecto para extraer datos de cartas de Magic: The Gathering y Pokemon TCG desde diversas fuentes. Cada scraper consolida listas de mazos, filtra cartas básicas/energías básicas, conserva la cantidad máxima vista por carta entre todos los mazos y exporta una lista ordenada alfabéticamente con las cartas que aún faltan adquirir.
 
 ## Scrapers disponibles
 
@@ -32,7 +32,10 @@ pip install -r requirements.txt
 
 ## Configuración
 
-Cada carpeta contiene un archivo `urls.json` con las URLs a scrapear. Edita ese archivo para agregar o quitar mazos.
+Cada carpeta contiene dos archivos editables manualmente:
+
+- `urls.json` — URLs de los mazos a scrapear. Edita este archivo para agregar o quitar mazos.
+- `database.txt` — Cartas que ya posees, en el mismo formato que `export.txt`. El scraper resta estas cantidades del resultado antes de exportar.
 
 ## Uso
 
@@ -45,11 +48,13 @@ cd mtggoldfish.app && python scraper.py
 
 ## Salida
 
-Cada scraper genera un archivo `export.txt` dentro de su carpeta con el formato:
+Cada scraper genera un archivo `export.txt` dentro de su carpeta con las cartas que faltan adquirir, en el formato:
 
 ```
 <cantidad> <nombre de carta>
 ```
+
+La cantidad refleja la diferencia entre lo que requieren los mazos y lo que ya está registrado en `database.txt`. Si una carta ya está completa en la base de datos, no aparece en el export.
 
 Ejemplo:
 

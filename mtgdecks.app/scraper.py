@@ -25,10 +25,23 @@ for url in urls:
             qty = int(match.group(1))
             name = match.group(2).strip()
             if name not in BASIC_LANDS:
-                all_cards[name] = min(4, all_cards.get(name, 0) + qty)
+                all_cards[name] = max(all_cards.get(name, 0), qty)
+
+db = {}
+try:
+    with open('database.txt', 'r', encoding='utf-8') as f:
+        for line in f:
+            m = re.match(r'^(\d+)\s+(.+)$', line.strip())
+            if m:
+                db[m.group(2).strip()] = int(m.group(1))
+except FileNotFoundError:
+    pass
+
+export = {name: all_cards[name] - db.get(name, 0) for name in all_cards}
+export = {name: qty for name, qty in export.items() if qty > 0}
 
 with open('export.txt', 'w', encoding='utf-8') as f:
-    for name in sorted(all_cards):
-        f.write(f"{all_cards[name]} {name}\n")
+    for name in sorted(export):
+        f.write(f"{export[name]} {name}\n")
 
-print(f"Guardadas {len(all_cards)} cartas en export.txt")
+print(f"Guardadas {len(export)} cartas en export.txt")
