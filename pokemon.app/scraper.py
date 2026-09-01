@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -31,7 +32,11 @@ def parse_card_text(text):
     m = re.match(r"^(\d+)\s+(.+)$", text.strip())
     if not m:
         return None
-    return int(m.group(1)), m.group(2).strip()
+    return int(m.group(1)), normalize_card_name(m.group(2).strip())
+
+
+def normalize_card_name(name):
+    return re.sub(r"\s+\([A-Z0-9]+-\d+\)$", "", name)
 
 
 def parse_card_href(href):
@@ -107,49 +112,80 @@ def detect_section(heading_text):
     return None
 
 
-def scrape_decks(urls):
-    aggregated = {"Pokemon": [], "Trainer": [], "Energy": []}
+def load_deck_cache(path="decks_cache.json"):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if isinstance(data, dict):
+                return data
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+    return {}
 
-    for url in urls:
-        print(f"-> {url}")
-        try:
-            resp = requests.get(url, headers=HEADERS, timeout=15)
-        except requests.RequestException as e:
-            print(f"  ! Error de red: {e}")
-            continue
-        if resp.status_code != 200:
-            print(f"  ! HTTP {resp.status_code}")
-            continue
-        soup = BeautifulSoup(resp.content, "html.parser")
-        for column in soup.find_all("div", class_="column"):
-            heading = column.find("div", class_="heading")
-            if not heading:
+
+def write_deck_cache(cache, path="decks_cache.json"):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(cache, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
+def scrape_decks(urls, refresh=False):
+    aggregated = {"Pokemon": [], "Trainer": [], "Energy": []}
+    cache = load_deck_cache()
+    unique_urls = list(dict.fromkeys(urls))
+
+    for url in unique_urls:
+        if not refresh and url in cache and isinstance(cache[url], dict):
+            print(f"-> cache: {url}")
+            deck_cards = cache[url]
+        else:
+            print(f"-> {url}")
+            try:
+                resp = requests.get(url, headers=HEADERS, timeout=15)
+            except requests.RequestException as e:
+                print(f"  ! Error de red: {e}")
                 continue
-            section = detect_section(heading.get_text(strip=True))
-            if not section:
+            if resp.status_code != 200:
+                print(f"  ! HTTP {resp.status_code}")
                 continue
-            for p in column.find_all("p"):
-                link = p.find("a")
-                if not link:
+            deck_cards = {"Pokemon": [], "Trainer": [], "Energy": []}
+            soup = BeautifulSoup(resp.content, "html.parser")
+            for column in soup.find_all("div", class_="column"):
+                heading = column.find("div", class_="heading")
+                if not heading:
                     continue
-                parsed = parse_card_text(link.get_text())
-                if not parsed:
+                section = detect_section(heading.get_text(strip=True))
+                if not section:
                     continue
-                qty, name = parsed
-                href_info = parse_card_href(link.get("href", ""))
-                if not href_info:
-                    continue
-                set_code, number = href_info
-                if section == "Energy" and name in BASIC_ENERGIES:
-                    continue
-                entry = (name, set_code, number, qty)
-                for i, e in enumerate(aggregated[section]):
-                    if e[0] == name and e[1] == set_code and e[2] == number:
-                        if qty > e[3]:
-                            aggregated[section][i] = entry
+                for p in column.find_all("p"):
+                    link = p.find("a")
+                    if not link:
+                        continue
+                    parsed = parse_card_text(link.get_text())
+                    if not parsed:
+                        continue
+                    qty, name = parsed
+                    href_info = parse_card_href(link.get("href", ""))
+                    if not href_info:
+                        continue
+                    set_code, number = href_info
+                    if section == "Energy" and name in BASIC_ENERGIES:
+                        continue
+                    deck_cards[section].append([name, set_code, number, qty])
+            cache[url] = deck_cards
+            write_deck_cache(cache)
+
+        for section in aggregated:
+            for entry in deck_cards.get(section, []):
+                name, set_code, number, qty = entry
+                name = normalize_card_name(name)
+                for i, current in enumerate(aggregated[section]):
+                    if current[0] == name and current[1] == set_code and current[2] == number:
+                        if qty > current[3]:
+                            aggregated[section][i] = (name, set_code, number, qty)
                         break
                 else:
-                    aggregated[section].append(entry)
+                    aggregated[section].append((name, set_code, number, qty))
     return aggregated
 
 
@@ -166,6 +202,7 @@ def read_collection(filename):
                     continue
                 qty = int(m.group(1))
                 name = m.group(2).strip()
+                name = re.sub(r"\s+\([A-Z0-9]+-\d+\)$", "", name)
                 aggregated[name] = aggregated.get(name, 0) + qty
     except FileNotFoundError:
         pass
@@ -178,41 +215,10 @@ def write_collection_file(path, items):
             f.write(f"{items[name]} {name}\n")
 
 
-def prompt_and_update(path, card_name, mazo_qty):
-    existing = read_collection(path)
-    if existing.get(card_name, 0) > 0:
-        return max(0, mazo_qty - existing[card_name])
-
-    while True:
-        try:
-            resp = input(f"  ¿Tienes '{card_name}'? (Enter=no la tengo, número=cantidad): ").strip()
-        except EOFError:
-            return mazo_qty
-        if resp == "":
-            return mazo_qty
-        try:
-            qty = int(resp)
-            if qty < 0:
-                print("  La cantidad no puede ser negativa.")
-                continue
-        except ValueError:
-            print("  Entrada no válida, escribe un número o Enter.")
-            continue
-        existing[card_name] = existing.get(card_name, 0) + qty
-        write_collection_file(path, existing)
-        return max(0, mazo_qty - qty)
-
-
 def write_named(path, names):
     with open(path, "w", encoding="utf-8") as f:
         for name in sorted(set(names)):
             f.write(f"{name}\n")
-
-
-def write_buylist(path, items):
-    with open(path, "w", encoding="utf-8") as f:
-        for name in sorted(items):
-            f.write(f"{items[name]} {name}\n")
 
 
 def write_pokemon(path, items):
@@ -224,9 +230,45 @@ def write_pokemon(path, items):
                 f.write(f"{qty} {name}\n")
 
 
+def write_export_file(path, items):
+    with open(path, "w", encoding="utf-8") as f:
+        for name, qty in sorted(items.items()):
+            if qty > 0:
+                f.write(f"{qty} {name}\n")
+
+
+def process_bucket(category, cards):
+    collection_dir = os.path.join("collection")
+    export_dir = os.path.join("export")
+    os.makedirs(collection_dir, exist_ok=True)
+    os.makedirs(export_dir, exist_ok=True)
+
+    collection_path = os.path.join(collection_dir, f"{category}.txt")
+    collection = read_collection(collection_path)
+    missing = {
+        name: max(needed_qty - collection.get(name, 0), 0)
+        for name, needed_qty in cards.items()
+    }
+    write_export_file(os.path.join(export_dir, f"{category}.txt"), missing)
+    for name, qty in sorted(missing.items()):
+        if qty:
+            print(f"  Exportar: {qty} {name}")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="Vuelve a descargar todos los mazos y actualiza el cache.",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     urls = load_urls()
-    aggregated = scrape_decks(urls)
+    aggregated = scrape_decks(urls, refresh=args.refresh)
     total = sum(len(v) for v in aggregated.values())
     print(f"Cartas unicas scrapeadas: {total}")
 
@@ -236,8 +278,9 @@ def main():
 
     cards_db = load_cards_db()
 
-    supporters, items, tools, stadiums, trainer_unknown = [], [], [], [], []
-    for name, set_code, number, _qty in aggregated["Trainer"]:
+    trainer_buckets = {bucket: {} for bucket in TRAINER_BUCKETS}
+    trainer_unknown = []
+    for name, set_code, number, qty in aggregated["Trainer"]:
         info, was_cached = fetch_card_subtype(name, set_code, number, cards_db)
         if not was_cached:
             time.sleep(0.12)
@@ -245,14 +288,8 @@ def main():
             trainer_unknown.append(name)
             continue
         bucket = SUBTYPE_TO_BUCKET.get(info["subtype"])
-        if bucket == "supporters":
-            supporters.append(name)
-        elif bucket == "items":
-            items.append(name)
-        elif bucket == "tools":
-            tools.append(name)
-        elif bucket == "stadiums":
-            stadiums.append(name)
+        if bucket in trainer_buckets:
+            trainer_buckets[bucket][name] = qty
         else:
             trainer_unknown.append(name)
 
@@ -260,49 +297,22 @@ def main():
         json.dump(cards_db, f, indent=2, ensure_ascii=False)
         f.write("\n")
 
-    energy_names = [name for name, _set, _num, _qty in aggregated["Energy"]]
+    pokemon_qtys = {
+        name: qty for name, _set, _num, qty in aggregated["Pokemon"]
+    }
+    process_bucket("pokemon", pokemon_qtys)
 
-    buylist_pokemon = {}
-    for name, _set, _num, qty in aggregated["Pokemon"]:
-        needed = prompt_and_update("collection_pokemon.txt", name, qty)
-        if needed > 0:
-            buylist_pokemon[name] = buylist_pokemon.get(name, 0) + needed
+    for bucket, cards in trainer_buckets.items():
+        process_bucket(bucket, cards)
 
-    buylist_trainers = {}
-    trainer_qtys = {name: qty for name, _set, _num, qty in aggregated["Trainer"]}
-    trainer_coll_path = {}
-    for name in supporters:
-        trainer_coll_path[name] = "collection_supporters.txt"
-    for name in items:
-        trainer_coll_path[name] = "collection_items.txt"
-    for name in tools:
-        trainer_coll_path[name] = "collection_tools.txt"
-    for name in stadiums:
-        trainer_coll_path[name] = "collection_stadiums.txt"
-    unknown_set = set(trainer_unknown)
-    for name, mazo_qty in trainer_qtys.items():
-        if name in unknown_set:
-            continue
-        coll_path = trainer_coll_path.get(name)
-        if coll_path is None:
-            continue
-        needed = prompt_and_update(coll_path, name, mazo_qty)
-        if needed > 0:
-            buylist_trainers[name] = buylist_trainers.get(name, 0) + needed
+    energy_qtys = {
+        name: qty for name, _set, _num, qty in aggregated["Energy"]
+    }
+    process_bucket("energies", energy_qtys)
 
-    for name, _set, _num, qty in aggregated["Energy"]:
-        needed = prompt_and_update("collection_energies.txt", name, qty)
-        if needed > 0:
-            buylist_trainers[name] = buylist_trainers.get(name, 0) + needed
-
-    write_buylist("buylist_pokemon.txt", buylist_pokemon)
-    print(f"  buylist_pokemon.txt: {len(buylist_pokemon)} cartas")
-
-    write_buylist("buylist_trainers.txt", buylist_trainers)
-    print(f"  buylist_trainers.txt: {len(buylist_trainers)} cartas")
-
-    write_named("export_unknown.txt", trainer_unknown)
-    print(f"  export_unknown.txt: {len(set(trainer_unknown))} cartas")
+    os.makedirs("export", exist_ok=True)
+    write_named("export/unknown.txt", trainer_unknown)
+    print(f"  export/unknown.txt: {len(set(trainer_unknown))} cartas")
 
 
 if __name__ == "__main__":

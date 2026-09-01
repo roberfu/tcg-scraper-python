@@ -110,5 +110,17 @@
   "Poke Pad|POR|81": {
     "supertype": "Trainer",
     "subtype": "Item"
+  },
+  "Rosa's Encouragement|POR|84": {
+    "supertype": "Trainer",
+    "subtype": "Supporter"
+  },
+  "Risky Ruins|MEG|127": {
+    "supertype": "Trainer",
+    "subtype": "Stadium"
+  },
+  "Area Zero Underdepths|SCR|131": {
+    "supertype": "Trainer",
+    "subtype": "Stadium"
   }
 }

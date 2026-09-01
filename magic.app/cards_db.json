@@ -501,7 +501,7 @@
   },
   "The Legend of Roku": {
     "is_pauper": false,
-    "type_category": "creatures"
+    "type_category": "enchantments"
   },
   "The Mycosynth Gardens": {
     "is_pauper": false,
@@ -5458,5 +5458,263 @@
   "Yathan Roadwatcher": {
     "is_pauper": false,
     "type_category": "creatures"
+  },
+  "Archaeomancer": {
+    "type_category": "creatures"
+  },
+  "Azure Fleet Admiral": {
+    "type_category": "creatures"
+  },
+  "Call Damage Control": {
+    "type_category": "spells"
+  },
+  "Contaminated Ground": {
+    "type_category": "enchantments"
+  },
+  "Ephemerate": {
+    "type_category": "spells"
+  },
+  "Giant's Boulder": {
+    "type_category": "artifacts"
+  },
+  "Gixian Infiltrator": {
+    "type_category": "creatures"
+  },
+  "Glacial Floodplain": {
+    "type_category": "lands"
+  },
+  "Gnaw to the Bone": {
+    "type_category": "spells"
+  },
+  "Ride's End": {
+    "type_category": "spells"
+  },
+  "Rustvale Bridge": {
+    "type_category": "lands"
+  },
+  "Scour from Existence": {
+    "type_category": "spells"
+  },
+  "Shenanigans": {
+    "type_category": "spells"
+  },
+  "Skred": {
+    "type_category": "spells"
+  },
+  "Surveillance Room": {
+    "type_category": "lands"
+  },
+  "Talisman of Resilience": {
+    "type_category": "artifacts"
+  },
+  "Union of the Third Path": {
+    "type_category": "spells"
+  },
+  "Volatile Fjord": {
+    "type_category": "lands"
+  },
+  "Demolition Field": {
+    "type_category": "lands"
+  },
+  "Gigantic Big Bear": {
+    "type_category": "creatures"
+  },
+  "Lumbering Worldwagon": {
+    "type_category": "artifacts"
+  },
+  "Meltstrider's Resolve": {
+    "type_category": "enchantments"
+  },
+  "Mossborn Hydra": {
+    "type_category": "creatures"
+  },
+  "Sapling Nursery": {
+    "type_category": "enchantments"
+  },
+  "Sazh's Chocobo": {
+    "type_category": "creatures"
+  },
+  "Shared Roots": {
+    "type_category": "spells"
+  },
+  "Snakeskin Veil": {
+    "type_category": "spells"
+  },
+  "Warg Tactics": {
+    "type_category": "spells"
+  },
+  "Distant Melody": {
+    "type_category": "spells"
+  },
+  "Elvish Vanguard": {
+    "type_category": "creatures"
+  },
+  "Hydro-Man, Fluid Felon": {
+    "type_category": "creatures"
+  },
+  "Lys Alana Huntmaster": {
+    "type_category": "creatures"
+  },
+  "Mirrorshell Crab": {
+    "type_category": "creatures"
+  },
+  "Valakut Invoker": {
+    "type_category": "creatures"
+  },
+  "Ash Barrens": {
+    "type_category": "lands"
+  },
+  "Elesh Norn, Mother of Machines": {
+    "type_category": "creatures"
+  },
+  "Horrific Assault": {
+    "type_category": "spells"
+  },
+  "Jewel Thief": {
+    "type_category": "creatures"
+  },
+  "Kessig Wolf Run": {
+    "type_category": "lands"
+  },
+  "Kruphix's Insight": {
+    "type_category": "spells"
+  },
+  "Militia Bugler": {
+    "type_category": "creatures"
+  },
+  "Rest in Peace": {
+    "type_category": "enchantments"
+  },
+  "Revoke Existence": {
+    "type_category": "spells"
+  },
+  "Selesnya Sanctuary": {
+    "type_category": "lands"
+  },
+  "Smaug, the Great Calamity": {
+    "type_category": "creatures"
+  },
+  "Spirit of the Labyrinth": {
+    "type_category": "creatures"
+  },
+  "Brinebarrow Intruder": {
+    "type_category": "creatures"
+  },
+  "Cryoshatter": {
+    "type_category": "enchantments"
+  },
+  "Faerie Miscreant": {
+    "type_category": "creatures"
+  },
+  "Harrier Strix": {
+    "type_category": "creatures"
+  },
+  "Of One Mind": {
+    "type_category": "spells"
+  },
+  "Snap": {
+    "type_category": "spells"
+  },
+  "Spreading Seas": {
+    "type_category": "enchantments"
+  },
+  "Unable to Scream": {
+    "type_category": "enchantments"
+  },
+  "Adarkar Wastes": {
+    "is_pauper": false,
+    "type_category": "lands"
+  },
+  "Akroma's Vengeance": {
+    "is_pauper": false,
+    "type_category": "spells"
+  },
+  "Aura of Silence": {
+    "is_pauper": false,
+    "type_category": "enchantments"
+  },
+  "Circle of Protection: Red": {
+    "is_pauper": true,
+    "type_category": "enchantments"
+  },
+  "Coastal Tower": {
+    "is_pauper": false,
+    "type_category": "lands"
+  },
+  "Decree of Justice": {
+    "is_pauper": false,
+    "type_category": "spells"
+  },
+  "Disenchant": {
+    "is_pauper": true,
+    "type_category": "spells"
+  },
+  "Dismantling Blow": {
+    "is_pauper": true,
+    "type_category": "spells"
+  },
+  "Dust Bowl": {
+    "is_pauper": false,
+    "type_category": "lands"
+  },
+  "Earthquake": {
+    "is_pauper": false,
+    "type_category": "spells"
+  },
+  "Exalted Angel": {
+    "is_pauper": false,
+    "type_category": "creatures"
+  },
+  "Fact or Fiction": {
+    "is_pauper": false,
+    "type_category": "spells"
+  },
+  "Faerie Conclave": {
+    "is_pauper": false,
+    "type_category": "lands"
+  },
+  "Galina's Knight": {
+    "is_pauper": true,
+    "type_category": "creatures"
+  },
+  "Humility": {
+    "is_pauper": false,
+    "type_category": "enchantments"
+  },
+  "Impulse": {
+    "is_pauper": true,
+    "type_category": "spells"
+  },
+  "Kor Haven": {
+    "is_pauper": false,
+    "type_category": "lands"
+  },
+  "Meddling Mage": {
+    "is_pauper": false,
+    "type_category": "creatures"
+  },
+  "Phyrexian Furnace": {
+    "is_pauper": false,
+    "type_category": "artifacts"
+  },
+  "Prohibit": {
+    "is_pauper": true,
+    "type_category": "spells"
+  },
+  "Standstill": {
+    "is_pauper": false,
+    "type_category": "enchantments"
+  },
+  "Teferi's Response": {
+    "is_pauper": false,
+    "type_category": "spells"
+  },
+  "Volcanic Hammer": {
+    "is_pauper": true,
+    "type_category": "spells"
+  },
+  "Wrath of God": {
+    "is_pauper": false,
+    "type_category": "spells"
   }
 }
